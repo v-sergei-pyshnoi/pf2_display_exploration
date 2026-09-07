@@ -1,26 +1,28 @@
-{{#if hint}}
-  <p class="pf2de__hint">{{hint}}</p>
-{{/if}}
-<div class="pf2de__list">
-  {{#each rows}}
-    <div class="pf2de__row" data-actor-id="{{actorId}}">
-      <img
-        class="pf2de__portrait {{#if canEdit}}pf2de__portrait--editable{{/if}}"
-        src="{{img}}"
-        alt="{{name}}"
-        {{#if canEdit}}
-          data-action="pickActivity"
-          data-tooltip="{{localize "pf2_display_exploration.panel.pickTooltip"}}"
-        {{/if}}
-      />
-      <div class="pf2de__info">
-        <span class="pf2de__name">{{name}}</span>
-        <span class="pf2de__activity {{#unless hasActivity}}pf2de__activity--none{{/unless}}">
-          {{activityLabel}}
-        </span>
+<div class="pf2de__body">
+  {{#if hint}}
+    <p class="pf2de__hint">{{hint}}</p>
+  {{/if}}
+  <div class="pf2de__list">
+    {{#each rows}}
+      <div class="pf2de__row" data-actor-id="{{actorId}}">
+        <img
+          class="pf2de__portrait {{#if canEdit}}pf2de__portrait--editable{{/if}}"
+          src="{{img}}"
+          alt="{{name}}"
+          {{#if canEdit}}
+            data-action="pickActivity"
+            data-tooltip="{{localize "pf2_display_exploration.panel.pickTooltip"}}"
+          {{/if}}
+        />
+        <div class="pf2de__info">
+          <span class="pf2de__name">{{name}}</span>
+          <span class="pf2de__activity {{#unless hasActivity}}pf2de__activity--none{{/unless}}">
+            {{activityLabel}}
+          </span>
+        </div>
       </div>
-    </div>
-  {{else}}
-    <p class="pf2de__empty">{{localize "pf2_display_exploration.panel.noParty"}}</p>
-  {{/each}}
+    {{else}}
+      <p class="pf2de__empty">{{localize "pf2_display_exploration.panel.noParty"}}</p>
+    {{/each}}
+  </div>
 </div>

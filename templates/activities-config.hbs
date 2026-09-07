@@ -1,49 +1,51 @@
-<p class="pf2de-config__intro">
-  {{localize "pf2_display_exploration.settings.activitiesMenu.hint"}}
-</p>
+<div class="pf2de-config__body">
+  <p class="pf2de-config__intro">
+    {{localize "pf2_display_exploration.settings.activitiesMenu.hint"}}
+  </p>
 
-<div class="pf2de-config__rows">
-  {{#each rows}}
-    <div class="pf2de-config__row" data-index="{{index}}">
-      <img class="pf2de-config__img" src="{{img}}" alt="" />
-      <div class="pf2de-config__fields">
-        <input
-          type="text"
-          name="activities.{{index}}.uuid"
-          value="{{uuid}}"
-          placeholder="{{localize "pf2_display_exploration.settings.activitiesMenu.uuidPlaceholder"}}"
-        />
-        <input
-          type="text"
-          name="activities.{{index}}.label"
-          value="{{label}}"
-          placeholder="{{#if resolvedName}}{{resolvedName}}{{else}}{{localize "pf2_display_exploration.settings.activitiesMenu.labelPlaceholder"}}{{/if}}"
-        />
+  <div class="pf2de-config__rows">
+    {{#each rows}}
+      <div class="pf2de-config__row" data-index="{{index}}">
+        <img class="pf2de-config__img" src="{{img}}" alt="" />
+        <div class="pf2de-config__fields">
+          <input
+            type="text"
+            name="activities.{{index}}.uuid"
+            value="{{uuid}}"
+            placeholder="{{localize "pf2_display_exploration.settings.activitiesMenu.uuidPlaceholder"}}"
+          />
+          <input
+            type="text"
+            name="activities.{{index}}.label"
+            value="{{label}}"
+            placeholder="{{#if resolvedName}}{{resolvedName}}{{else}}{{localize "pf2_display_exploration.settings.activitiesMenu.labelPlaceholder"}}{{/if}}"
+          />
+        </div>
+        <button
+          type="button"
+          class="pf2de-config__remove"
+          data-action="removeRow"
+          data-index="{{index}}"
+          data-tooltip="{{localize "pf2_display_exploration.settings.activitiesMenu.removeRow"}}"
+        >
+          <i class="fa-solid fa-trash"></i>
+        </button>
       </div>
-      <button
-        type="button"
-        class="pf2de-config__remove"
-        data-action="removeRow"
-        data-index="{{index}}"
-        data-tooltip="{{localize "pf2_display_exploration.settings.activitiesMenu.removeRow"}}"
-      >
-        <i class="fa-solid fa-trash"></i>
-      </button>
-    </div>
-  {{else}}
-    <p class="pf2de-config__empty">
-      {{localize "pf2_display_exploration.settings.activitiesMenu.empty"}}
-    </p>
-  {{/each}}
-</div>
+    {{else}}
+      <p class="pf2de-config__empty">
+        {{localize "pf2_display_exploration.settings.activitiesMenu.empty"}}
+      </p>
+    {{/each}}
+  </div>
 
-<div class="pf2de-config__toolbar">
-  <button type="button" data-action="addRow">
-    <i class="fa-solid fa-plus"></i>
-    {{localize "pf2_display_exploration.settings.activitiesMenu.addRow"}}
-  </button>
-  <button type="button" data-action="populate">
-    <i class="fa-solid fa-wand-magic-sparkles"></i>
-    {{localize "pf2_display_exploration.settings.activitiesMenu.populate"}}
-  </button>
+  <div class="pf2de-config__toolbar">
+    <button type="button" data-action="addRow">
+      <i class="fa-solid fa-plus"></i>
+      {{localize "pf2_display_exploration.settings.activitiesMenu.addRow"}}
+    </button>
+    <button type="button" data-action="populate">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+      {{localize "pf2_display_exploration.settings.activitiesMenu.populate"}}
+    </button>
+  </div>
 </div>
