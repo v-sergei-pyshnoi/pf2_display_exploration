@@ -32,15 +32,12 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
   static listen() {
     game.socket.off(this.SOCKET);
     game.socket.on(this.SOCKET, (data) => {
-      console.log(`${MODULE_ID} | socket received`, data);
       if (data?.action === "forceOpen") this.instance.render(true);
     });
-    console.log(`${MODULE_ID} | socket listener registered on "${this.SOCKET}"`);
   }
 
   /** Open the panel here and tell every other client to do the same. */
   static forceOpenAll() {
-    console.log(`${MODULE_ID} | emitting forceOpen on "${this.SOCKET}"`);
     game.socket.emit(this.SOCKET, { action: "forceOpen" });
     this.instance.render(true);
   }
