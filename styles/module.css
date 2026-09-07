@@ -1,0 +1,55 @@
+#pf2_display_exploration-panel .window-content {
+  padding: 0.25rem;
+}
+
+.pf2de__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pf2de__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.pf2de__portrait {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border: 1px solid var(--color-border-dark, #7a7971);
+  border-radius: 4px;
+}
+
+.pf2de__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pf2de__name {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf2de__activity {
+  font-size: 0.85em;
+}
+
+.pf2de__activity--none {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.pf2de__empty {
+  margin: 0.5rem;
+  font-style: italic;
+  opacity: 0.7;
+}

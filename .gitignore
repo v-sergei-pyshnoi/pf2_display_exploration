@@ -1,0 +1,13 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Build / packaging output (if tooling is added later)
+node_modules/
+dist/
+*.zip
+*.tgz
+*.log

@@ -1,0 +1,15 @@
+<div class="pf2de__list">
+  {{#each rows}}
+    <div class="pf2de__row">
+      <img class="pf2de__portrait" src="{{img}}" alt="{{name}}" />
+      <div class="pf2de__info">
+        <span class="pf2de__name">{{name}}</span>
+        <span class="pf2de__activity {{#unless hasActivities}}pf2de__activity--none{{/unless}}">
+          {{activitiesLabel}}
+        </span>
+      </div>
+    </div>
+  {{else}}
+    <p class="pf2de__empty">{{localize "pf2_display_exploration.panel.noParty"}}</p>
+  {{/each}}
+</div>

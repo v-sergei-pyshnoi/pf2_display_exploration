@@ -1,0 +1,8 @@
+{
+  "pf2_display_exploration.panel.title": "Exploration Activities",
+  "pf2_display_exploration.panel.noActivity": "No activity set",
+  "pf2_display_exploration.panel.noParty": "No active party.",
+  "pf2_display_exploration.settings.showToPlayers.name": "Show Panel to Players",
+  "pf2_display_exploration.settings.showToPlayers.hint": "When enabled, non-GM players also see the exploration panel. Requires a reload to take effect.",
+  "pf2_display_exploration.notifications.systemRequired": "PF2e Display Exploration requires the Pathfinder Second Edition system."
+}
