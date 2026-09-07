@@ -30,7 +30,9 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
 
   /** Register the socket listener that reacts to a GM's force-open. */
   static listen() {
+    game.socket.off(this.SOCKET);
     game.socket.on(this.SOCKET, (data) => {
+      console.debug(`${MODULE_ID} | socket`, data);
       if (data?.action === "forceOpen") this.instance.render(true);
     });
   }
