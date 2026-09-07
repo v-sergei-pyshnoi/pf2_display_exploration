@@ -21,9 +21,25 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
     return (this.#instance ??= new this());
   }
 
+  static SOCKET = `module.${MODULE_ID}`;
+
   /** Re-render the panel only if it is already on screen. */
   static refresh() {
     if (this.#instance?.rendered) this.#instance.render(false);
+  }
+
+  /** Register the socket listener that reacts to a GM's force-open. */
+  static listen() {
+    game.socket.off(this.SOCKET);
+    game.socket.on(this.SOCKET, (data) => {
+      if (data?.action === "forceOpen") this.instance.render(true);
+    });
+  }
+
+  /** Open the panel here and tell every other client to do the same. */
+  static forceOpenAll() {
+    game.socket.emit(this.SOCKET, { action: "forceOpen" });
+    this.instance.render(true);
   }
 
   static DEFAULT_OPTIONS = {
@@ -33,7 +49,8 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
     window: { title: `${MODULE_ID}.panel.title`, minimizable: true },
     position: { width: 280, height: "auto" },
     actions: {
-      pickActivity: ExplorationPanel.#onPickActivity
+      pickActivity: ExplorationPanel.#onPickActivity,
+      forceOpenAll: ExplorationPanel.#onForceOpenAll
     }
   };
 
@@ -72,6 +89,7 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
     const none = game.i18n.localize(`${MODULE_ID}.panel.noActivity`);
     const configured = getConfiguredActivities();
     return {
+      isGM: game.user.isGM,
       hint: configured.length
         ? null
         : game.i18n.localize(`${MODULE_ID}.panel.notConfigured`),
@@ -106,6 +124,12 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
     const actor = game.actors.get(actorId);
     if (!actor || !(game.user.isGM || actor.isOwner)) return;
     this.#openMenu(target, actor);
+  }
+
+  static #onForceOpenAll() {
+    if (!game.user.isGM) return;
+    ExplorationPanel.forceOpenAll();
+    ui.notifications.info(game.i18n.localize(`${MODULE_ID}.panel.forceOpenDone`));
   }
 
   #openMenu(anchor, actor) {

@@ -65,6 +65,21 @@
   opacity: 0.8;
 }
 
+.pf2de__toolbar {
+  display: flex;
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--color-border-light-primary, rgba(0, 0, 0, 0.1));
+}
+
+.pf2de__toolbar button {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 /* ---- Portrait activity menu -------------------------------------------------- */
 
 .pf2de__menu {

@@ -25,4 +25,17 @@
       <p class="pf2de__empty">{{localize "pf2_display_exploration.panel.noParty"}}</p>
     {{/each}}
   </div>
+
+  {{#if isGM}}
+    <div class="pf2de__toolbar">
+      <button
+        type="button"
+        data-action="forceOpenAll"
+        data-tooltip="{{localize "pf2_display_exploration.panel.forceOpenHint"}}"
+      >
+        <i class="fa-solid fa-people-arrows"></i>
+        {{localize "pf2_display_exploration.panel.forceOpen"}}
+      </button>
+    </div>
+  {{/if}}
 </div>

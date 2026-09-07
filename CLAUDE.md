@@ -69,7 +69,16 @@ modules it imports.
   `data-action="pickActivity"`; the handler builds a plain-DOM `nav.pf2de__menu`
   appended to `document.body`, positioned under the portrait, dismissed on
   outside `pointerdown` / Escape / re-render / close. `setPosition()` is
-  overridden to debounce-save into `panelPosition`.
+  overridden to debounce-save into `panelPosition`. `_prepareContext` also sets
+  `isGM`, which gates a `data-action="forceOpenAll"` button in the template.
+  Static surface: `refresh()` (re-render if open), `listen()` (registers the
+  `game.socket.on(SOCKET, …)` handler, called once from `ready`),
+  `forceOpenAll()` (GM → `game.socket.emit` + local render). `SOCKET` is
+  `` `module.${MODULE_ID}` `` and the only payload is `{ action: "forceOpen" }`,
+  which force-renders the panel on every client regardless of `showToPlayers`.
+  **`module.json` must declare `"socket": true`** or the Foundry server silently
+  drops `module.<id>` events instead of relaying them (the emitter sees no
+  error); changing that flag needs a world relaunch, not just an F5.
 - **`scripts/apps/activities-config.js`** — `ActivitiesConfig`, an `ApplicationV2`
   form (`tag: "form"`, `form.handler`, `templates/generic/form-footer.hbs` as the
   `footer` PART). Holds a working copy in `#rows`; `#syncFromForm()` reads live
@@ -98,6 +107,12 @@ Portrait click → `pickActivity` action → menu → `setExplorationActivity()`
 `actor.update({"system.exploration": [...]})` (plus possible
 `createEmbeddedDocuments`/`deleteEmbeddedDocuments`) → `updateActor` hook →
 panel re-render.
+
+`module.js` also registers a `getSceneControlButtons` hook that adds a
+`button: true` tool (`pf2deExploration`) to the `tokens` control group — visible
+to a GM, or to players when `showToPlayers` — whose click renders the panel. The
+GM's "Open for Everyone" button → `forceOpenAll` action → `forceOpenAll()` →
+socket broadcast → every client's `listen()` handler renders the panel.
 
 ### Foundry API conventions used here
 
