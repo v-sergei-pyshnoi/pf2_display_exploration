@@ -4,6 +4,11 @@
   "pf2_display_exploration.panel.noParty": "No active party.",
   "pf2_display_exploration.panel.notConfigured": "No activities configured yet — add some in Module Settings.",
   "pf2_display_exploration.panel.pickTooltip": "Click to set exploration activity",
+  "pf2_display_exploration.panel.forceOpen": "Open for Everyone",
+  "pf2_display_exploration.panel.forceOpenHint": "Force this panel open on every connected client.",
+  "pf2_display_exploration.panel.forceOpenDone": "Opened the exploration panel for all players.",
+
+  "pf2_display_exploration.controls.open": "Exploration Activities",
 
   "pf2_display_exploration.settings.showToPlayers.name": "Show Panel to Players",
   "pf2_display_exploration.settings.showToPlayers.hint": "When enabled, non-GM players also see the exploration panel. Requires a reload to take effect.",

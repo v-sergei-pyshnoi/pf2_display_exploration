@@ -21,8 +21,26 @@ Hooks.once("ready", () => {
     return;
   }
 
+  ExplorationPanel.listen();
+
   const forPlayers = game.settings.get(MODULE_ID, SETTINGS.showToPlayers);
   if (game.user.isGM || forPlayers) ExplorationPanel.instance.render(true);
+});
+
+// Sidebar tool button that (re)opens the panel.
+Hooks.on("getSceneControlButtons", (controls) => {
+  const group = controls.tokens ?? controls.token;
+  if (!group?.tools) return;
+
+  group.tools.pf2deExploration = {
+    name: "pf2deExploration",
+    title: `${MODULE_ID}.controls.open`,
+    icon: "fa-solid fa-person-hiking",
+    button: true,
+    order: Object.keys(group.tools).length,
+    visible: game.user.isGM || game.settings.get(MODULE_ID, SETTINGS.showToPlayers),
+    onChange: () => ExplorationPanel.instance.render(true)
+  };
 });
 
 // Re-render when a member's exploration activities change, or when the active
