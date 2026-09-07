@@ -2,28 +2,41 @@
   "id": "pf2_display_exploration",
   "title": "PF2e Display Exploration",
   "description": "Displays each party member's current Pathfinder 2e exploration activity in an at-a-glance panel.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
   },
   "authors": [
-    { "name": "Sergei Pyshnoi", "github": "v-sergei-pyshnoi" }
+    {
+      "name": "Sergei Pyshnoi",
+      "github": "v-sergei-pyshnoi"
+    }
   ],
   "relationships": {
     "systems": [
       {
         "id": "pf2e",
         "type": "system",
-        "compatibility": { "minimum": "6.0.0" }
+        "compatibility": {
+          "minimum": "6.0.0"
+        }
       }
     ]
   },
-  "esmodules": ["scripts/module.js"],
-  "styles": ["styles/module.css"],
+  "esmodules": [
+    "scripts/module.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
   "socket": true,
   "languages": [
-    { "lang": "en", "name": "English", "path": "lang/en.json" }
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
   ],
   "url": "https://github.com/v-sergei-pyshnoi/pf2_display_exploration",
   "manifest": "https://github.com/v-sergei-pyshnoi/pf2_display_exploration/releases/latest/download/module.json",
