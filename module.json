@@ -21,6 +21,7 @@
   },
   "esmodules": ["scripts/module.js"],
   "styles": ["styles/module.css"],
+  "socket": true,
   "languages": [
     { "lang": "en", "name": "English", "path": "lang/en.json" }
   ],

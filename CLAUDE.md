@@ -76,6 +76,9 @@ modules it imports.
   `forceOpenAll()` (GM → `game.socket.emit` + local render). `SOCKET` is
   `` `module.${MODULE_ID}` `` and the only payload is `{ action: "forceOpen" }`,
   which force-renders the panel on every client regardless of `showToPlayers`.
+  **`module.json` must declare `"socket": true`** or the Foundry server silently
+  drops `module.<id>` events instead of relaying them (the emitter sees no
+  error); changing that flag needs a world relaunch, not just an F5.
 - **`scripts/apps/activities-config.js`** — `ActivitiesConfig`, an `ApplicationV2`
   form (`tag: "form"`, `form.handler`, `templates/generic/form-footer.hbs` as the
   `footer` PART). Holds a working copy in `#rows`; `#syncFromForm()` reads live
