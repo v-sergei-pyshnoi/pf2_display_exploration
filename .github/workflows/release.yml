@@ -2,6 +2,16 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, e.g. 0.3.0 (leading v optional). Leave empty to release the version already in module.json."
+        required: false
+        type: string
+      prerelease:
+        description: "Mark the GitHub release as a pre-release."
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -13,33 +23,55 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Read module metadata
-        id: meta
+      - name: Resolve version
+        id: version
         run: |
-          module_id=$(jq -r '.id' module.json)
-          version=$(jq -r '.version' module.json)
-          if [ -z "$version" ] || [ "$version" = "null" ]; then
-            echo "::error::module.json has no version"
+          input='${{ inputs.version }}'
+          input="${input#v}"
+          input="$(printf '%s' "$input" | tr -d '[:space:]')"
+          if [ -n "$input" ]; then
+            version="$input"
+          else
+            version="$(jq -r '.version' module.json)"
+          fi
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "::error::Invalid version '$version' (expected e.g. 0.3.0 or 0.3.0-beta.1)"
             exit 1
           fi
           {
-            echo "module_id=$module_id"
             echo "version=$version"
             echo "tag=v$version"
           } >> "$GITHUB_OUTPUT"
+          echo "Releasing v$version"
 
-      - name: Ensure the version tag does not already exist
+      - name: Fail if the tag already exists
         run: |
-          tag='${{ steps.meta.outputs.tag }}'
+          tag='${{ steps.version.outputs.tag }}'
           if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
-            echo "::error::Tag $tag already exists — bump \"version\" in module.json before releasing."
+            echo "::error::Tag $tag already exists — pick a new version."
             exit 1
           fi
 
-      - name: Pin manifest and download URLs for this release
+      - name: Bump module.json on the branch if the version changed
+        run: |
+          version='${{ steps.version.outputs.version }}'
+          current="$(jq -r '.version' module.json)"
+          if [ "$current" = "$version" ]; then
+            echo "module.json is already at $version — no bump commit needed."
+            exit 0
+          fi
+          tmp=$(mktemp)
+          jq --arg v "$version" '.version = $v' module.json > "$tmp"
+          mv "$tmp" module.json
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Release v$version"
+          git push origin "HEAD:${{ github.ref_name }}"
+
+      - name: Pin manifest and download URLs (packaged copy only)
         run: |
           repo_url="${{ github.server_url }}/${{ github.repository }}"
-          tag='${{ steps.meta.outputs.tag }}'
+          tag='${{ steps.version.outputs.tag }}'
           tmp=$(mktemp)
           jq \
             --arg url "$repo_url" \
@@ -61,13 +93,14 @@ jobs:
             LICENSE \
             README.md
 
-      - name: Create GitHub release and tag the commit
+      - name: Create the GitHub release and tag the commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create '${{ steps.meta.outputs.tag }}' \
+          gh release create '${{ steps.version.outputs.tag }}' \
             module.json \
             module.zip \
-            --target '${{ github.sha }}' \
-            --title '${{ steps.meta.outputs.tag }}' \
-            --generate-notes
+            --target "$(git rev-parse HEAD)" \
+            --title '${{ steps.version.outputs.tag }}' \
+            --generate-notes \
+            ${{ inputs.prerelease && '--prerelease' || '' }}
