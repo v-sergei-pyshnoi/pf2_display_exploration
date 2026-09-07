@@ -27,6 +27,12 @@ assumed). Development is done live against a running Foundry instance:
 - **Manifest / JSON validity:** the only "build" concern is that `module.json`
   and `lang/en.json` stay valid JSON; Foundry surfaces parse errors in its
   console on load.
+- **Release:** the `.github/workflows/release.yml` workflow is `workflow_dispatch`
+  only. It reads `version` from `module.json`, fails if the `v<version>` tag
+  already exists (so bump `version` first), pins the `manifest`/`download` URLs
+  in the packaged copy, zips the module, and `gh release create`s the
+  `v<version>` tag on the run's commit with `module.json` + `module.zip`
+  attached. The committed `module.json` keeps `latest`-pointing URLs.
 
 If a toolchain is added later, wire it up in `module.json`'s `esmodules`/`styles`
 to point at build output, and update this section.

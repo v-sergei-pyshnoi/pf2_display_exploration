@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read module metadata
+        id: meta
+        run: |
+          module_id=$(jq -r '.id' module.json)
+          version=$(jq -r '.version' module.json)
+          if [ -z "$version" ] || [ "$version" = "null" ]; then
+            echo "::error::module.json has no version"
+            exit 1
+          fi
+          {
+            echo "module_id=$module_id"
+            echo "version=$version"
+            echo "tag=v$version"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Ensure the version tag does not already exist
+        run: |
+          tag='${{ steps.meta.outputs.tag }}'
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "::error::Tag $tag already exists — bump \"version\" in module.json before releasing."
+            exit 1
+          fi
+
+      - name: Pin manifest and download URLs for this release
+        run: |
+          repo_url="${{ github.server_url }}/${{ github.repository }}"
+          tag='${{ steps.meta.outputs.tag }}'
+          tmp=$(mktemp)
+          jq \
+            --arg url "$repo_url" \
+            --arg manifest "$repo_url/releases/latest/download/module.json" \
+            --arg download "$repo_url/releases/download/$tag/module.zip" \
+            '.url = $url | .manifest = $manifest | .download = $download' \
+            module.json > "$tmp"
+          mv "$tmp" module.json
+          jq . module.json
+
+      - name: Package module.zip
+        run: |
+          zip -r module.zip \
+            module.json \
+            scripts \
+            styles \
+            templates \
+            lang \
+            LICENSE \
+            README.md
+
+      - name: Create GitHub release and tag the commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create '${{ steps.meta.outputs.tag }}' \
+            module.json \
+            module.zip \
+            --target '${{ github.sha }}' \
+            --title '${{ steps.meta.outputs.tag }}' \
+            --generate-notes
