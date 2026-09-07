@@ -2,7 +2,24 @@
   "pf2_display_exploration.panel.title": "Exploration Activities",
   "pf2_display_exploration.panel.noActivity": "No activity set",
   "pf2_display_exploration.panel.noParty": "No active party.",
+  "pf2_display_exploration.panel.notConfigured": "No activities configured yet — add some in Module Settings.",
+  "pf2_display_exploration.panel.pickTooltip": "Click to set exploration activity",
+
   "pf2_display_exploration.settings.showToPlayers.name": "Show Panel to Players",
   "pf2_display_exploration.settings.showToPlayers.hint": "When enabled, non-GM players also see the exploration panel. Requires a reload to take effect.",
-  "pf2_display_exploration.notifications.systemRequired": "PF2e Display Exploration requires the Pathfinder Second Edition system."
+
+  "pf2_display_exploration.settings.activitiesMenu.name": "Exploration Activities List",
+  "pf2_display_exploration.settings.activitiesMenu.label": "Configure Activities",
+  "pf2_display_exploration.settings.activitiesMenu.hint": "Define the activities offered when a portrait is clicked. Each row points at a PF2e action item by UUID — drag an action from a compendium onto a row to fill it. The label is optional and overrides the action's name.",
+  "pf2_display_exploration.settings.activitiesMenu.uuidPlaceholder": "Compendium.pf2e.actionspf2e.Item.…",
+  "pf2_display_exploration.settings.activitiesMenu.labelPlaceholder": "Display label (optional)",
+  "pf2_display_exploration.settings.activitiesMenu.addRow": "Add Row",
+  "pf2_display_exploration.settings.activitiesMenu.removeRow": "Remove",
+  "pf2_display_exploration.settings.activitiesMenu.populate": "Add Standard Activities",
+  "pf2_display_exploration.settings.activitiesMenu.empty": "No rows yet. Add one, or drag a PF2e action here.",
+  "pf2_display_exploration.settings.activitiesMenu.save": "Save Activities",
+
+  "pf2_display_exploration.notifications.systemRequired": "PF2e Display Exploration requires the Pathfinder Second Edition system.",
+  "pf2_display_exploration.notifications.activityMissing": "Could not load the configured activity ({uuid}).",
+  "pf2_display_exploration.notifications.noActionsPack": "The pf2e.actionspf2e compendium was not found."
 }

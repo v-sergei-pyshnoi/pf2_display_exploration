@@ -1,3 +1,5 @@
+/* ---- Panel ---------------------------------------------------------------- */
+
 #pf2_display_exploration-panel .window-content {
   padding: 0.25rem;
 }
@@ -26,6 +28,14 @@
   border-radius: 4px;
 }
 
+.pf2de__portrait--editable {
+  cursor: pointer;
+}
+
+.pf2de__portrait--editable:hover {
+  outline: 2px solid var(--color-warm-2, #ff6400);
+}
+
 .pf2de__info {
   display: flex;
   flex-direction: column;
@@ -48,8 +58,110 @@
   opacity: 0.7;
 }
 
+.pf2de__hint,
 .pf2de__empty {
   margin: 0.5rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ---- Portrait activity menu -------------------------------------------------- */
+
+.pf2de__menu {
+  position: fixed;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--color-bg, #1b1d24);
+  border: 1px solid var(--color-border-dark, #000);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.pf2de__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pf2de__menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pf2de__menu-item--active {
+  font-weight: bold;
+}
+
+.pf2de__menu-item img {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  border: none;
+}
+
+/* ---- Activities config form ---------------------------------------------------- */
+
+.pf2de-config__intro {
+  margin: 0 0 0.5rem;
+  opacity: 0.8;
+}
+
+.pf2de-config__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 50vh;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.pf2de-config__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pf2de-config__img {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border-dark, #7a7971);
+  border-radius: 4px;
+}
+
+.pf2de-config__fields {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pf2de-config__remove {
+  flex: 0 0 auto;
+  width: 32px;
+}
+
+.pf2de-config__toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.pf2de-config__empty {
+  padding: 12px;
+  text-align: center;
   font-style: italic;
   opacity: 0.7;
 }

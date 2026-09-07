@@ -1,13 +1,18 @@
-import { MODULE_ID, TEMPLATE_ROOT } from "../constants.js";
+import { MODULE_ID, SETTINGS, TEMPLATE_ROOT } from "../constants.js";
+import {
+  currentActivityLabels,
+  getConfiguredActivities,
+  setExplorationActivity
+} from "../activities.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
- * Floating panel that lists the active party's members and the PF2e exploration
- * activities each of them currently has set.
+ * Floating panel listing the active party and each member's current PF2e
+ * exploration activity. Clicking a portrait (GM, or the actor's owner) opens a
+ * menu of the activities configured in module settings.
  *
- * Use the shared singleton via {@link ExplorationPanel.instance}; do not `new`
- * it directly.
+ * Use the shared singleton via {@link ExplorationPanel.instance}; do not `new` it.
  */
 export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) {
   static #instance = null;
@@ -16,33 +21,48 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
     return (this.#instance ??= new this());
   }
 
+  /** Re-render the panel only if it is already on screen. */
+  static refresh() {
+    if (this.#instance?.rendered) this.#instance.render(false);
+  }
+
   static DEFAULT_OPTIONS = {
     id: `${MODULE_ID}-panel`,
     tag: "aside",
+    classes: ["pf2de"],
     window: { title: `${MODULE_ID}.panel.title`, minimizable: true },
-    position: { width: 280, height: "auto" }
+    position: { width: 280, height: "auto" },
+    actions: {
+      pickActivity: ExplorationPanel.#onPickActivity
+    }
   };
 
   static PARTS = {
     body: { template: `${TEMPLATE_ROOT}/exploration-panel.hbs` }
   };
 
+  #menu = null;
+  #onDocPointer = null;
+  #onDocKey = null;
+
+  #savePosition = foundry.utils.debounce((position) => {
+    game.settings.set(MODULE_ID, SETTINGS.panelPosition, {
+      top: position.top,
+      left: position.left
+    });
+  }, 400);
+
   /** @override */
   _initializeApplicationOptions(options) {
     const opts = super._initializeApplicationOptions(options);
-    Object.assign(opts.position, game.settings.get(MODULE_ID, "panelPosition"));
+    Object.assign(opts.position, game.settings.get(MODULE_ID, SETTINGS.panelPosition));
     return opts;
   }
 
   /** @override */
   setPosition(position) {
     const applied = super.setPosition(position);
-    if (applied) {
-      game.settings.set(MODULE_ID, "panelPosition", {
-        top: applied.top,
-        left: applied.left
-      });
-    }
+    if (applied) this.#savePosition(applied);
     return applied;
   }
 
@@ -50,25 +70,111 @@ export class ExplorationPanel extends HandlebarsApplicationMixin(ApplicationV2) 
   async _prepareContext() {
     const members = game.actors.party?.members ?? [];
     const none = game.i18n.localize(`${MODULE_ID}.panel.noActivity`);
+    const configured = getConfiguredActivities();
     return {
+      hint: configured.length
+        ? null
+        : game.i18n.localize(`${MODULE_ID}.panel.notConfigured`),
       rows: members.map((actor) => {
-        const activities = this.#explorationActivities(actor);
+        const labels = currentActivityLabels(actor);
         return {
+          actorId: actor.id,
           name: actor.name,
           img: actor.img,
-          hasActivities: activities.length > 0,
-          activitiesLabel: activities.length ? activities.join(", ") : none
+          canEdit: game.user.isGM || actor.isOwner,
+          hasActivity: labels.length > 0,
+          activityLabel: labels.length ? labels.join(", ") : none
         };
       })
     };
   }
 
-  /**
-   * Names of the exploration activities the actor currently has active.
-   * PF2e stores these as an array of item ids on `actor.system.exploration`.
-   */
-  #explorationActivities(actor) {
-    const ids = actor.system?.exploration ?? [];
-    return ids.map((id) => actor.items.get(id)?.name).filter(Boolean);
+  /** @override */
+  _onRender(context, options) {
+    super._onRender?.(context, options);
+    this.#closeMenu();
+  }
+
+  /** @override */
+  async close(options) {
+    this.#closeMenu();
+    return super.close(options);
+  }
+
+  static async #onPickActivity(event, target) {
+    const actorId = target.closest("[data-actor-id]")?.dataset.actorId;
+    const actor = game.actors.get(actorId);
+    if (!actor || !(game.user.isGM || actor.isOwner)) return;
+    this.#openMenu(target, actor);
+  }
+
+  #openMenu(anchor, actor) {
+    this.#closeMenu();
+
+    const active = new Set(actor.system?.exploration ?? []);
+    const entries = [
+      {
+        uuid: null,
+        label: game.i18n.localize(`${MODULE_ID}.panel.noActivity`),
+        img: "icons/svg/cancel.svg"
+      },
+      ...getConfiguredActivities()
+    ];
+
+    const menu = document.createElement("nav");
+    menu.className = "pf2de__menu";
+    for (const entry of entries) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "pf2de__menu-item";
+
+      const icon = document.createElement("img");
+      icon.src = entry.img;
+      icon.alt = "";
+      const label = document.createElement("span");
+      label.textContent = entry.label;
+      item.append(icon, label);
+
+      const activeItem = entry.uuid
+        ? [...active].some((id) => actor.items.get(id)?.name === entry.label)
+        : active.size === 0;
+      if (activeItem) item.classList.add("pf2de__menu-item--active");
+
+      item.addEventListener("click", async () => {
+        this.#closeMenu();
+        await setExplorationActivity(actor, entry.uuid);
+      });
+      menu.appendChild(item);
+    }
+
+    document.body.appendChild(menu);
+    const rect = anchor.getBoundingClientRect();
+    menu.style.left = `${Math.round(rect.left)}px`;
+    menu.style.top = `${Math.round(rect.bottom + 4)}px`;
+
+    this.#menu = menu;
+    this.#onDocPointer = (ev) => {
+      if (!menu.contains(ev.target)) this.#closeMenu();
+    };
+    this.#onDocKey = (ev) => {
+      if (ev.key === "Escape") this.#closeMenu();
+    };
+    // Defer so the click that opened the menu doesn't immediately close it.
+    setTimeout(() => {
+      document.addEventListener("pointerdown", this.#onDocPointer);
+      document.addEventListener("keydown", this.#onDocKey);
+    }, 0);
+  }
+
+  #closeMenu() {
+    if (this.#onDocPointer) {
+      document.removeEventListener("pointerdown", this.#onDocPointer);
+    }
+    if (this.#onDocKey) {
+      document.removeEventListener("keydown", this.#onDocKey);
+    }
+    this.#onDocPointer = this.#onDocKey = null;
+    this.#menu?.remove();
+    this.#menu = null;
   }
 }
